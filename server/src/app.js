@@ -1,5 +1,7 @@
 import express from 'express';
 import authRoutes from './routes/auth.js';
+import inquiryRoutes from './routes/inquiries.js'; 
+import { requireAuth } from './middleware/requireAuth.js'; 
 import { HttpError } from './errors.js';
 
 export const app = express();
@@ -8,6 +10,7 @@ app.use(express.json()); // read JSON request bodies into req.body
 
 app.get('/api/health', (req, res) => res.json({ ok: true })); // "is the server alive?"
 app.use('/api/auth', authRoutes);
+app.use('/api/inquiries', requireAuth, inquiryRoutes);
 
 // Any URL we don't know -> 404
 app.use((req, res) => {
