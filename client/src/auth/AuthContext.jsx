@@ -38,6 +38,9 @@ export function AuthProvider({ children }) {
 }
 
 // Any component can call useAuth() to get { user, login, logout, checking }
+// (Keeping the hook next to its provider is a common pattern; this rule only affects
+// hot-reload during development, so we switch it off for this one line.)
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }

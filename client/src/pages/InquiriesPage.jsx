@@ -15,17 +15,19 @@ export default function InquiriesPage() {
   const q = searchParams.get('q') ?? '';
 
   const [searchText, setSearchText] = useState(q); // what's typed in the box
-  const [inquiries, setInquiries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [reloadCount, setReloadCount] = useState(0); // bump to re-fetch ("Try again")
+
+  // Each request gets a "key". The result remembers which key it belongs to.
+  const requestKey = `${status}|${q}|${reloadCount}`;
+  const [result, setResult] = useState({ key: null, inquiries: [], error: '' });
+
+  // Loading = we don't have an answer for the CURRENT key yet (calculated, not stored)
+  const loading = result.key !== requestKey;
+  const { inquiries, error } = result;
 
   // Load the list whenever the filters change (or "Try again" is clicked)
   useEffect(() => {
     let ignore = false; // becomes true if a newer request replaces this one
-
-    setLoading(true);
-    setError('');
 
     const params = new URLSearchParams();
     if (status) params.set('status', status);
@@ -34,19 +36,16 @@ export default function InquiriesPage() {
 
     api(`/inquiries${query ? `?${query}` : ''}`)
       .then((data) => {
-        if (!ignore) setInquiries(data.inquiries);
+        if (!ignore) setResult({ key: requestKey, inquiries: data.inquiries, error: '' });
       })
       .catch((err) => {
-        if (!ignore) setError(err.message);
-      })
-      .finally(() => {
-        if (!ignore) setLoading(false);
+        if (!ignore) setResult({ key: requestKey, inquiries: [], error: err.message });
       });
 
     return () => {
       ignore = true; // "cleanup": runs before the next request starts
     };
-  }, [status, q, reloadCount]);
+  }, [requestKey, status, q]);
 
   // Change one or more filters in the URL; empty values are removed
   function updateFilters(changes) {

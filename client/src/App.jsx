@@ -3,6 +3,8 @@ import { useAuth } from './auth/AuthContext.jsx';
 import Layout from './components/Layout.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import InquiriesPage from './pages/InquiriesPage.jsx';
+import NewInquiryPage from './pages/NewInquiryPage.jsx';
+import InquiryDetailPage from './pages/InquiryDetailPage.jsx';
 
 // Sends logged-out users to /login. This is only for a nicer experience:
 // the REAL protection is requireAuth on the server.
@@ -21,6 +23,8 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route path="/inquiries" element={<InquiriesPage />} />
+        <Route path="/inquiries/new" element={<NewInquiryPage />} />
+        <Route path="/inquiries/:id" element={<InquiryDetailPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/inquiries" replace />} />
     </Routes>
